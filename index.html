@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeqat - Prayer Times & Qibla Direction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Amiri&family=Noto+Naskh+Arabic&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f8ff;
+            --surface: #ffffff;
+            --text: #071827;
+            --muted: #586b7c;
+            --accent: #0b63d7;
+            --accent-2: #6b5bdb;
+            --radius: 14px;
+            --shadow: 0 10px 30px rgba(6, 20, 45, 0.08);
+            --success: #0aa36b;
+            --warning: #ff9500;
+            --danger: #ff3b30;
+        }
+
+        body[data-theme="dark"] {
+            --bg: #041025;
+            --surface: #0e1a2f;
+            --text: #e9f7ff;
+            --muted: #9fb0c9;
+            --accent: #3ea0ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .app {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .small {
+            font-size: 0.86rem;
+            color: var(--muted);
+        }
+
+        .prayer-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .pray-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(11, 99, 215, 0.03), transparent);
+        }
+
+        .pray-name {
+            font-weight: 700;
+        }
+
+        .pray-time {
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(10, 20, 40, 0.06);
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress i {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-radius: 999px;
+            transition: width 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .compass-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .compass {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #fff, #eef8ff);
+            position: relative;
+            box-shadow: rgba(10, 20, 40, 0.06) 0 10px 28px;
+        }
+
+        .needle {
+            position: absolute;
+            width: 6px;
+            height: 60%;
+            left: 50%;
+            top: 12%;
+            transform-origin: 50% 100%;
+            border-radius: 6px;
+            background: var(--accent);
+            transition: transform 140ms linear;
+        }
+
+        .center-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .compass-markers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .marker {
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background: var(--muted);
+            left: 50%;
+            transform-origin: bottom center;
+        }
+
+        .marker.n { transform: translateX(-50%) rotate(0deg); }
+        .marker.e { transform: translateX(-50%) rotate(90deg); }
+        .marker.s { transform: translateX(-50%) rotate(180deg); }
+        .marker.w { transform: translateX(-50%) rotate(270deg); }
+
+        .marker-label {
+            position: absolute;
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: bold;
+        }
+
+        .marker-n { top: 5px; left: 50%; transform: translateX(-50%); }
+        .marker-e { top: 50%; right: 5px; transform: translateY(-50%); }
+        .marker-s { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .marker-w { top: 50%; left: 5px; transform: translateY(-50%); }
+
+        .quran {
+            font-family: 'Amiri', serif;
+            font-size: 20px;
+            direction: rtl;
+            text-align: right;
+            line-height: 1.6;
+            margin-top: 8px;
+        }
+
+        .translation {
+            font-size: 15px;
+            margin-top: 8px;
+            color: var(--muted);
+        }
+
+        .urdu {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 16px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-top: 6px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 0;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid rgba(11, 99, 215, 0.08);
+        }
+
+        .btn.playing {
+            background: var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        .btn.warning {
+            background: var(--warning);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(10, 163, 107, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(10, 163, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(10, 163, 107, 0); }
+        }
+
+        @keyframes prohibited {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .chart-wrap {
+            height: 180px;
+            margin-top: 8px;
+            border-radius: 10px;
+            padding: 8px;
+            background: linear-gradient(180deg, rgba(11, 99, 215, 0.02), transparent);
+        }
+
+        .zawal-alert {
+            background: linear-gradient(180deg, rgba(255, 59, 48, 0.1), transparent);
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: prohibited 2s infinite;
+        }
+
+        .zawal-alert i {
+            color: var(--danger);
+            font-size: 20px;
+        }
+
+        .zawal-alert div {
+            flex: 1;
+        }
+
+        .zawal-alert h4 {
+            color: var(--danger);
+            margin-bottom: 4px;
+        }
+
+        .zawal-alert p {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        #meeqat-crazy-popup {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.9) rotate(-6deg);
+            display: inline-flex;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(180deg, #fff, #f6fffa);
+            color: #063b14;
+            border-radius: 999px;
+            box-shadow: 0 12px 30px rgba(6, 20, 30, 0.12);
+            z-index: 999999;
+            font-weight: 700;
+            font-size: 15px;
+            opacity: 0;
+            pointer-events: none;
+            border: 1px solid rgba(20, 120, 60, 0.08);
+            transform-origin: center center;
+        }
+
+        #meeqat-crazy-popup .tick {
+            display: inline-grid;
+            place-items: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #05c46b, #0aa36b);
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 6px 18px rgba(10, 160, 80, 0.18), inset 0 -4px 12px rgba(255, 255, 255, 0.06);
+            transform: scale(0.9);
+        }
+
+        #meeqat-crazy-popup .txt {
+            display: inline-block;
+            line-height: 1;
+            color: #063b14;
+        }
+
+        @keyframes meeqatPopupIn {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6) rotate(-18deg); }
+            40% { opacity: 1; transform: translate(-50%, -50%) scale(1.08) rotate(6deg); }
+            70% { transform: translate(-50%, -50%) scale(0.98) rotate(-3deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes meeqatPopupOut {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) rotate(-6deg); }
+        }
+
+        #meeqat-crazy-popup.show {
+            animation: meeqatPopupIn 420ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+            pointer-events: auto;
+        }
+
+        #meeqat-crazy-popup.hide {
+            animation: meeqatPopupOut 360ms ease forwards;
+            pointer-events: none;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+        }
+
+        input[type="range"] {
+            width: 100px;
+            height: 5px;
+            -webkit-appearance: none;
+            background: rgba(11, 99, 215, 0.2);
+            border-radius: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+
+        @media (min-width: 768px) {
+            .prayer-grid {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .pray-row {
+                width: 48%;
+            }
+            
+            .compass {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .chart-wrap {
+                height: 220px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="app">
+        <header>
+            <div class="logo">
+                <i class="fa-solid fa-mosque"></i>
+            </div>
+            <div>
+                <h1>Meeqat - Prayer Times & Qibla</h1>
+                <div class="subtitle">From Bunjwah, Kishtwar, Jammu & Kashmir</div>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
+                <button class="btn ghost" id="themeToggle" title="Toggle theme">
+                    <i class="fa-solid fa-adjust"></i>
+                </button>
+                <button class="btn" id="posterBtn" title="Download poster">
+                    <i class="fa-solid fa-image"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="card">
+            <div class="top-row">
+                <div>
+                    <div class="small">Today</div>
+                    <div id="todayLabel" style="font-weight: 800; font-size: 1.02rem;">Loading date...</div>
+                    <div id="desiLabel" class="small" style="margin-top: 6px;"></div>
+                    <div id="hijriLabel" class="small" style="margin-top: 3px;"></div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="small">Location</div>
+                    <div id="locationLabel" style="font-weight: 700;">Bunjwah, Kishtwar</div>
+                    <div id="qiblaText" class="small" style="margin-top: 6px;">Qibla: ---</div>
+                </div>
+            </div>
+            <div id="prayerContainer" class="prayer-grid"></div>
+            
+            <div id="zawalAlert" class="zawal-alert" style="display: none;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <div>
+                    <h4>Zawal Time - Prayer Prohibited</h4>
+                    <p>Avoid performing prayers during this time (20 minutes after sunrise)</p>
+                </div>
+                <div id="zawalCountdown" style="font-weight: 700; color: var(--danger);"></div>
+            </div>
+            
+            <div class="progress">
+                <i id="progressBar"></i>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 8px; align-items: center;">
+                <div class="small">Next prayer</div>
+                <div id="nextPrayerLabel" style="font-weight: 700;">---</div>
+            </div>
+            <div id="countdown" class="small" style="margin-top: 6px;">---</div>
+            <div class="controls">
+                <button class="btn" id="btn-get-location">
+                    <i class="fa-solid fa-location-crosshairs"></i> Update Location
+                </button>
+                <button class="btn ghost" id="btn-calibrate">
+                    <i class="fa-solid fa-magnet"></i> Calibrate
+                </button>
+                <button class="btn ghost" id="btn-refresh">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="card compass-wrap">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                    <div class="small">Qibla Compass</div>
+                    <div class="small" id="compassHint" style="margin-top: 6px;">Point device toward Kaaba</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="small">Bearing</div>
+                    <div id="bearingLabel" style="font-weight: 700;">---</div>
+                </div>
+            </div>
+            <div style="height: 10px;"></div>
+            <div class="compass" id="compass">
+                <div class="compass-markers">
+                    <div class="marker n"></div>
+                    <div class="marker e"></div>
+                    <div class="marker s"></div>
+                    <div class="marker w"></div>
+                    <div class="marker-label marker-n">N</div>
+                    <div class="marker-label marker-e">E</div>
+                    <div class="marker-label marker-s">S</div>
+                    <div class="marker-label marker-w">W</div>
+                </div>
+                <div class="needle" id="needle"></div>
+                <div class="center-dot"></div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button class="btn" id="btn-point">
+                    <i class="fa-solid fa-compass"></i> Point Qibla
+                </button>
+                <button class="btn ghost" id="btn-guide">
+                    <i class="fa-solid fa-question"></i> Guide
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="small">Daily Timeline</div>
+                    <div style="font-weight: 700;">Prayer Timeline</div>
+                </div>
+                <div class="small" id="chartMeta">---</div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="prayerChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="small">Qur'an - random verse</div>
+                    <div style="font-weight: 700;">Ayah</div>
+                </div>
+                <div class="small" id="ayahRef">---</div>
+            </div>
+            <div id="ayahArabic" class="quran">Loading...</div>
+            <div id="ayahTranslation" class="translation">Loading translation...</div>
+            <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+                <button class="btn ghost" id="btn-new-ayah">
+                    <i class="fa-solid fa-arrows-rotate"></i> New Ayah
+                </button>
+                <button class="btn" id="btn-listen-ayah">
+                    <i class="fa-solid fa-play"></i> Listen
+                </button>
+                <button class="btn ghost" id="btn-copy-translation" title="Copy translation">
+                    <i class="fa-regular fa-copy"></i> Copy Translation
+                </button>
+            </div>
+            <div class="audio-controls">
+                <div class="volume-control">
+                    <i class="fa-solid fa-volume-high"></i>
+                    <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.7">
+                </div>
+                <div id="audioStatus" class="small">Ready to play</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="small">Hadith - random</div>
+                    <div style="font-weight: 700;">Hadith</div>
+                </div>
+                <div class="small" id="hadithRef">---</div>
+            </div>
+            <div id="hadithText" class="urdu">Loading...</div>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button class="btn ghost" id="btn-new-hadith">
+                    <i class="fa-solid fa-arrows-rotate"></i> New Hadith
+                </button>
+                <button class="btn ghost" id="btn-copy-hadith">
+                    <i class="fa-solid fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="small">Extras</div>
+                    <div style="font-weight: 700;">Weekly View • Settings</div>
+                </div>
+                <div>
+                    <button class="btn ghost" id="btn-pwa">
+                        <i class="fa-solid fa-phone"></i> Install
+                    </button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+                <button class="btn ghost" id="btn-toggle-urdu">Urdu Labels</button>
+                <button class="btn ghost" id="btn-toggle-translation">Toggle Translation</button>
+                <button class="btn ghost" id="btn-toggle-athan">Athan Sample</button>
+            </div>
+            <div style="margin-top: 12px;">
+                <canvas id="weekMini"></canvas>
+            </div>
+        </div>
+
+        <footer style="text-align: center; margin-top: 12px; color: var(--muted); font-size: 0.9rem;">
+            Made with ❤️ for the Muslim Ummah | Deploy to HTTPS for full functionality
+        </footer>
+    </div>
+
+    <canvas id="posterCanvas" width="1600" height="900" style="display: none;"></canvas>
+
+    <div id="meeqat-crazy-popup" role="status" aria-live="polite" aria-hidden="true" style="display: none;">
+        <div class="tick"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
+        <div class="txt" id="meeqat-crazy-text">Mashallah Text Copied ☺️</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.umd.min.js"></script>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            // Configuration
+            const MEEQAT_FILE = './meeqat_2025.json';
+            const DESI_FILE = './desi_calendar_2025.json';
+            const KAABA = { lat: 21.422487, lon: 39.826206 };
+            const TOTAL_AYAH = 6236;
+            
+            // For Bunjwah, Kishtwar, Jammu and Kashmir
+            const DEFAULT_LOCATION = { 
+                lat: 33.3167, 
+                lon: 75.7667,
+                name: "Bunjwah, Kishtwar"
+            };
+            
+            // State variables
+            let meeqat = null, desi = null, todayKey = null, latlon = DEFAULT_LOCATION, latestQiblaBearing = null;
+            let prayerChart = null, weekChart = null, nextPrayerTimer = null;
+            let audio = null;
+            let isZawalTime = false;
+            
+            // DOM Elements
+            const todayLabelEl = document.getElementById('todayLabel');
+            const desiLabelEl = document.getElementById('desiLabel');
+            const hijriLabelEl = document.getElementById('hijriLabel');
+            const locationLabelEl = document.getElementById('locationLabel');
+            const qiblaTextEl = document.getElementById('qiblaText');
+            const prayerContainerEl = document.getElementById('prayerContainer');
+            const progressBarEl = document.getElementById('progressBar');
+            const nextPrayerLabelEl = document.getElementById('nextPrayerLabel');
+            const countdownEl = document.getElementById('countdown');
+            const needleEl = document.getElementById('needle');
+            const bearingLabelEl = document.getElementById('bearingLabel');
+            const ayahArabicEl = document.getElementById('ayahArabic');
+            const ayahTranslationEl = document.getElementById('ayahTranslation');
+            const ayahRefEl = document.getElementById('ayahRef');
+            const hadithTextEl = document.getElementById('hadithText');
+            const hadithRefEl = document.getElementById('hadithRef');
+            const btnGetLocation = document.getElementById('btn-get-location');
+            const btnCalibrate = document.getElementById('btn-calibrate');
+            const btnRefresh = document.getElementById('btn-refresh');
+            const btnPoint = document.getElementById('btn-point');
+            const btnGuide = document.getElementById('btn-guide');
+            const btnNewAyah = document.getElementById('btn-new-ayah');
+            const btnListenAyah = document.getElementById('btn-listen-ayah');
+            const btnCopyTranslation = document.getElementById('btn-copy-translation');
+            const btnNewHadith = document.getElementById('btn-new-hadith');
+            const btnCopyHadith = document.getElementById('btn-copy-hadith');
+            const posterBtn = document.getElementById('posterBtn');
+            const themeToggle = document.getElementById('themeToggle');
+            const volumeControl = document.getElementById('volumeControl');
+            const audioStatus = document.getElementById('audioStatus');
+            const zawalAlert = document.getElementById('zawalAlert');
+            const zawalCountdown = document.getElementById('zawalCountdown');
+            const prayerChartCtx = document.getElementById('prayerChart').getContext('2d');
+            const weekMiniCtx = document.getElementById('weekMini').getContext('2d');
+            const posterCanvas = document.getElementById('posterCanvas');
+            
+            // Initialize animations
+            AOS.init({ duration: 700, once: true });
+            gsap.from('.card', { opacity: 0, y: 10, stagger: 0.02, duration: 0.6, ease: 'power3.out' });
+            
+            // Initialize audio
+            function initAudio() {
+                // Create audio element
+                audio = new Audio();
+                audio.src = 'https://cdn.islamic.network/audio/athan/abdul-baset/64/1.mp3';
+                audio.preload = 'auto';
+                
+                // Set volume from control
+                audio.volume = volumeControl.value;
+                
+                // Add event listeners for audio
+                audio.addEventListener('play', () => {
+                    btnListenAyah.classList.add('playing');
+                    audioStatus.textContent = 'Playing...';
+                });
+                
+                audio.addEventListener('pause', () => {
+                    btnListenAyah.classList.remove('playing');
+                    audioStatus.textContent = 'Paused';
+                });
+                
+                audio.addEventListener('ended', () => {
+                    btnListenAyah.classList.remove('playing');
+                    audioStatus.textContent = 'Finished playing';
+                    setTimeout(() => {
+                        audioStatus.textContent = 'Ready to play';
+                    }, 2000);
+                });
+                
+                audio.addEventListener('error', (e) => {
+                    console.error('Audio error:', e);
+                    btnListenAyah.classList.remove('playing');
+                    audioStatus.textContent = 'Error loading audio';
+                });
+                
+                // Volume control event listener
+                volumeControl.addEventListener('input', () => {
+                    if (audio) {
+                        audio.volume = volumeControl.value;
+                    }
+                });
+            }
+            
+            // Play audio function
+            function playAudio() {
+                if (!audio) {
+                    initAudio();
+                }
+                
+                try {
+                    if (audio.paused) {
+                        audio.play()
+                            .then(() => {
+                                console.log('Audio is playing');
+                            })
+                            .catch(error => {
+                                console.error('Playback failed:', error);
+                                audioStatus.textContent = 'Playback failed. Click again.';
+                            });
+                    } else {
+                        audio.pause();
+                    }
+                } catch (error) {
+                    console.error('Audio error:', error);
+                    audioStatus.textContent = 'Audio error. Please try again.';
+                }
+            }
+            
+            // Utility functions
+            function isoToday() { return new Date().toISOString().slice(0, 10); }
+            
+            function toISO(d) { return d.toISOString().slice(0, 10); }
+            
+            function parseHHMMToDate(key, hhmm) {
+                const [h, m] = hhmm.split(':').map(x => parseInt(x, 10));
+                const d = new Date(key + 'T00:00:00');
+                d.setHours(h, m, 0, 0);
+                return d;
+            }
+            
+            function timeDiffHuman(ms) {
+                if (ms < 0) ms = 0;
+                const s = Math.floor(ms / 1000);
+                const hh = Math.floor(s / 3600);
+                const mm = Math.floor((s % 3600) / 60);
+                const ss = s % 60;
+                
+                if (hh > 0) return `${hh}h ${mm}m`;
+                if (mm > 0) return `${mm}m ${ss}s`;
+                return `${ss}s`;
+            }
+            
+            function bearingTo(lat1, lon1, lat2, lon2) {
+                const toRad = d => d * Math.PI / 180;
+                const toDeg = r => (r * 180 / Math.PI + 360) % 360;
+                
+                const φ1 = toRad(lat1);
+                const φ2 = toRad(lat2);
+                const Δλ = toRad(lon2 - lon1);
+                
+                const y = Math.sin(Δλ) * Math.cos(φ2);
+                const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+                
+                return toDeg(Math.atan2(y, x));
+            }
+            
+            function extractHeadingFromEvent(ev) {
+                if (!ev) return null;
+                if (typeof ev.webkitCompassHeading !== 'undefined') return ev.webkitCompassHeading;
+                if (typeof ev.alpha === 'number') return (360 - ev.alpha) % 360;
+                return null;
+            }
+            
+            // Load JSON data
+            async function loadMeeqat() {
+                try {
+                    const r = await fetch(MEEQAT_FILE);
+                    if (!r.ok) throw new Error('Meeqat load failed');
+                    meeqat = await r.json();
+                } catch (e) {
+                    console.warn('Meeqat load fallback', e);
+                    // Sample data for demonstration
+                    meeqat = { 
+                        [isoToday()]: {
+                            "Fajar": "05:15", 
+                            "Sunrise": "06:45", 
+                            "Nisf al-Nahar": "12:15", 
+                            "Zohar": "12:30", 
+                            "Asar": "16:00", 
+                            "Maghrib": "18:45", 
+                            "Isha": "20:15"
+                        }
+                    };
+                }
+            }
+            
+            async function loadDesi() {
+                try {
+                    const r = await fetch(DESI_FILE);
+                    if (!r.ok) throw new Error('Desi load failed');
+                    desi = await r.json();
+                } catch (e) {
+                    console.warn('Desi load failed', e);
+                    desi = null;
+                }
+            }
+            
+            // Pick keys & render prayers
+            function pickMeeqatKey() {
+                const iso = isoToday();
+                if (meeqat && meeqat[iso]) return iso;
+                if (meeqat) {
+                    const mmdd = iso.slice(5);
+                    for (const k of Object.keys(meeqat)) {
+                        if (k.slice(5) === mmdd) return k;
+                    }
+                    return Object.keys(meeqat)[0];
+                }
+                return iso;
+            }
+            
+            function renderPrayers() {
+                todayKey = pickMeeqatKey();
+                const today = meeqat[todayKey];
+                
+                todayLabelEl.textContent = new Date(todayKey).toLocaleDateString(undefined, { 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                });
+                
+                // Desi label
+                if (desi && desi[todayKey]) {
+                    desiLabelEl.textContent = `Desi: ${desi[todayKey].desi_day} ${desi[todayKey].desi_month} ${desi[todayKey].desi_year}`;
+                } else {
+                    desiLabelEl.textContent = '';
+                }
+                
+                // Hijri label (placeholder)
+                hijriLabelEl.textContent = '';
+                
+                // Render prayer rows
+                const order = ['Fajar', 'Sunrise', 'Nisf al-Nahar', 'Zohar', 'Asar', 'Maghrib', 'Isha'];
+                prayerContainerEl.innerHTML = '';
+                
+                if (!today) {
+                    prayerContainerEl.innerHTML = '<div class="small">Prayer times not available</div>';
+                    return;
+                }
+                
+                order.forEach(k => {
+                    if (today[k]) {
+                        const div = document.createElement('div');
+                        div.className = 'pray-row';
+                        div.innerHTML = `<div class="pray-name">${k}</div><div class="pray-time">${today[k]}</div>`;
+                        prayerContainerEl.appendChild(div);
+                    }
+                });
+                
+                renderPrayerChart(todayKey, today);
+                computeNextPrayer(todayKey, today);
+            }
+            
+            // Chart rendering
+            function timeToDecimalHours(hhmm) {
+                const [h, m] = hhmm.split(':').map(x => parseInt(x, 10));
+                return h + m / 60;
+            }
+            
+            function renderPrayerChart(key, today) {
+                try {
+                    const labels = [];
+                    const data = [];
+                    
+                    ['Fajar', 'Zohar', 'Asar', 'Maghrib', 'Isha'].forEach(name => {
+                        if (today[name]) {
+                            labels.push(name);
+                            data.push(timeToDecimalHours(today[name]));
+                        }
+                    });
+                    
+                    if (prayerChart) prayerChart.destroy();
+                    
+                    prayerChart = new Chart(prayerChartCtx, {
+                        type: 'line',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: 'Time',
+                                data,
+                                borderColor: getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#0b63d7',
+                                tension: 0.3,
+                                pointRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    ticks: {
+                                        callback: v => {
+                                            const hh = Math.floor(v);
+                                            const mm = Math.round((v - hh) * 60);
+                                            return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+                                        }
+                                    },
+                                    min: 0,
+                                    max: 24
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                    
+                    document.getElementById('chartMeta').textContent = `Times for ${new Date(key).toLocaleDateString()}`;
+                } catch (e) {
+                    console.warn('chart error', e);
+                }
+            }
+            
+            // Next prayer & progress with Zawal time handling
+            function computeNextPrayer(key, today) {
+                if (nextPrayerTimer) clearTimeout(nextPrayerTimer);
+                
+                const now = new Date();
+                const entries = [];
+                
+                // Define prayer sequence (excluding Nisf al-Nahar for countdown)
+                const prayerSequence = ['Fajar', 'Sunrise', 'Zohar', 'Asar', 'Maghrib', 'Isha'];
+                
+                prayerSequence.forEach(name => {
+                    if (today[name]) {
+                        entries.push({ name, time: parseHHMMToDate(key, today[name]) });
+                    }
+                });
+                
+                // Check if we're in Zawal time (20 minutes after sunrise)
+                const sunriseTime = today['Sunrise'] ? parseHHMMToDate(key, today['Sunrise']) : null;
+                if (sunriseTime) {
+                    const zawalEndTime = new Date(sunriseTime.getTime() + 20 * 60000);
+                    
+                    if (now >= sunriseTime && now <= zawalEndTime) {
+                        // We're in Zawal time
+                        isZawalTime = true;
+                        zawalAlert.style.display = 'flex';
+                        nextPrayerLabelEl.textContent = 'Zawal Time';
+                        nextPrayerLabelEl.style.color = 'var(--danger)';
+                        
+                        // Update Zawal countdown
+                        const updateZawalCountdown = () => {
+                            const remaining = zawalEndTime - new Date();
+                            if (remaining <= 0) {
+                                zawalAlert.style.display = 'none';
+                                isZawalTime = false;
+                                computeNextPrayer(key, today); // Recalculate next prayer
+                                return;
+                            }
+                            
+                            zawalCountdown.textContent = timeDiffHuman(remaining);
+                            progressBarEl.style.width = '100%';
+                            progressBarEl.style.background = 'var(--danger)';
+                            countdownEl.textContent = '';
+                            
+                            setTimeout(updateZawalCountdown, 1000);
+                        };
+                        
+                        updateZawalCountdown();
+                        return;
+                    } else {
+                        // Not in Zawal time
+                        isZawalTime = false;
+                        zawalAlert.style.display = 'none';
+                        nextPrayerLabelEl.style.color = '';
+                    }
+                }
+                
+                // Find next prayer
+                let next = null;
+                for (const e of entries) {
+                    if (e.time > now) {
+                        next = e;
+                        break;
+                    }
+                }
+                
+                // If no prayer found today, use first prayer of next day
+                if (!next && entries.length > 0) {
+                    next = entries[0];
+                    next.time = new Date(entries[0].time.getTime() + 24 * 3600 * 1000);
+                }
+                
+                if (!next) {
+                    nextPrayerLabelEl.textContent = '---';
+                    countdownEl.textContent = '';
+                    progressBarEl.style.width = '0%';
+                    return;
+                }
+                
+                nextPrayerLabelEl.textContent = `${next.name} • ${next.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                
+                function tick() {
+                    const now2 = new Date();
+                    
+                    // Find previous prayer for progress calculation
+                    let prev = { time: new Date(now2.getTime() - 3600 * 1000) }; // Default to 1 hour ago
+                    for (let i = entries.length - 1; i >= 0; i--) {
+                        if (entries[i].time < now2) {
+                            prev = entries[i];
+                            break;
+                        }
+                    }
+                    
+                    const totalWindow = next.time - prev.time;
+                    const elapsed = now2 - prev.time;
+                    const pct = Math.max(0, Math.min(100, (elapsed / totalWindow) * 100));
+                    
+                    progressBarEl.style.width = pct + '%';
+                    progressBarEl.style.background = ''; // Reset to default
+                    
+                    const remaining = next.time - now2;
+                    countdownEl.textContent = timeDiffHuman(remaining);
+                    
+                    if (remaining <= 0) {
+                        setTimeout(() => computeNextPrayer(key, today), 900);
+                    } else {
+                        nextPrayerTimer = setTimeout(tick, 900);
+                    }
+                }
+                
+                tick();
+            }
+            
+            // Qibla: location + orientation
+            function enableQibla() {
+                if (!('geolocation' in navigator)) {
+                    alert('Geolocation not supported');
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(pos => {
+                    latlon = { 
+                        lat: pos.coords.latitude, 
+                        lon: pos.coords.longitude,
+                        name: "Your Location"
+                    };
+                    locationLabelEl.textContent = `${latlon.lat.toFixed(4)}, ${latlon.lon.toFixed(4)}`;
+                    
+                    latestQiblaBearing = bearingTo(latlon.lat, latlon.lon, KAABA.lat, KAABA.lon);
+                    qiblaTextEl.textContent = `Qibla: ${latestQiblaBearing.toFixed(1)}° from North`;
+                    bearingLabelEl.textContent = `${latestQiblaBearing.toFixed(1)}°`;
+                    
+                    needleEl.style.transform = `translateX(-50%) rotate(${latestQiblaBearing}deg)`;
+                    
+                    requestOrientationPermission();
+                }, err => {
+                    console.warn('geo err', err);
+                    // Use default location if permission denied
+                    latlon = DEFAULT_LOCATION;
+                    locationLabelEl.textContent = DEFAULT_LOCATION.name;
+                    
+                    latestQiblaBearing = bearingTo(latlon.lat, latlon.lon, KAABA.lat, KAABA.lon);
+                    qiblaTextEl.textContent = `Qibla: ${latestQiblaBearing.toFixed(1)}° from North`;
+                    bearingLabelEl.textContent = `${latestQiblaBearing.toFixed(1)}°`;
+                    
+                    needleEl.style.transform = `translateX(-50%) rotate(${latestQiblaBearing}deg)`;
+                    
+                    alert('Using default location. Enable location for accurate Qibla.');
+                }, { enableHighAccuracy: true, maximumAge: 60000 });
+            }
+            
+            function requestOrientationPermission() {
+                if (typeof DeviceOrientationEvent !== 'undefined' && 
+                    typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(resp => {
+                            if (resp === 'granted') {
+                                window.addEventListener('deviceorientation', handleOrientation, true);
+                            } else {
+                                compassHint('Orientation permission denied');
+                            }
+                        })
+                        .catch(err => {
+                            console.warn(err);
+                            compassHint('Orientation error');
+                        });
+                } else {
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                }
+            }
+            
+            function handleOrientation(ev) {
+                const heading = extractHeadingFromEvent(ev);
+                if (heading === null) return;
+                
+                if (latlon && latestQiblaBearing !== null) {
+                    const rot = latestQiblaBearing - heading;
+                    needleEl.style.transform = `translateX(-50%) rotate(${rot}deg)`;
+                } else {
+                    needleEl.style.transform = `translateX(-50%) rotate(${0 - heading}deg)`;
+                }
+            }
+            
+            function compassHint(txt) {
+                document.getElementById('compassHint').textContent = txt;
+            }
+            
+            // Quran & Hadith fetch
+            async function fetchRandomAyah() {
+                try {
+                    ayahArabicEl.textContent = 'Loading...';
+                    ayahTranslationEl.textContent = 'Loading translation...';
+                    ayahRefEl.textContent = '';
+                    
+                    const n = Math.floor(Math.random() * TOTAL_AYAH) + 1;
+                    const url = `https://api.alquran.cloud/v1/ayah/${n}/editions/quran-uthmani,en.asad`;
+                    
+                    const r = await fetch(url);
+                    if (!r.ok) throw new Error('Quran API failed');
+                    
+                    const j = await r.json();
+                    const arab = j.data.find(d => d.edition.language === 'ar');
+                    const eng = j.data.find(d => d.edition.language === 'en');
+                    
+                    ayahArabicEl.textContent = arab ? arab.text : '---';
+                    ayahTranslationEl.textContent = eng ? eng.text : '---';
+                    ayahRefEl.textContent = arab ? `${arab.surah ? arab.surah.englishName : ''} ${arab.numberInSurah || ''}` : '';
+                } catch (e) {
+                    console.warn('ayah err', e);
+                    ayahArabicEl.textContent = 'Could not fetch ayah';
+                    ayahTranslationEl.textContent = '';
+                }
+            }
+            
+            async function fetchRandomHadith() {
+                try {
+                    hadithTextEl.textContent = 'Loading...';
+                    hadithRefEl.textContent = '';
+                    
+                    const max = 7563;
+                    const n = Math.floor(Math.random() * max) + 1;
+                    const url = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/${n}.min.json`;
+                    
+                    const r = await fetch(url);
+                    if (!r.ok) throw new Error('Hadith fetch failed');
+                    
+                    const j = await r.json();
+                    hadithTextEl.textContent = j.text || j.hadith || '---';
+                    hadithRefEl.textContent = j.book || '';
+                } catch (e) {
+                    console.warn('hadith err', e);
+                    hadithTextEl.textContent = 'Could not load hadith';
+                }
+            }
+            
+            // Poster generation (Canvas)
+            async function ensureFontsReady() {
+                if (document.fonts && document.fonts.ready) {
+                    await document.fonts.ready;
+                }
+            }
+            
+            function wrapText(ctx, text, maxWidth) {
+                const words = text.split(' ');
+                const lines = [];
+                let cur = '';
+                
+                for (const w of words) {
+                    const test = cur ? cur + ' ' + w : w;
+                    const m = ctx.measureText(test);
+                    
+                    if (m.width > maxWidth && cur) {
+                        lines.push(cur);
+                        cur = w;
+                    } else {
+                        cur = test;
+                    }
+                }
+                
+                if (cur) lines.push(cur);
+                return lines;
+            }
+            
+            async function drawPosterAndDownload() {
+                await ensureFontsReady();
+                
+                const ctx = posterCanvas.getContext('2d');
+                ctx.clearRect(0, 0, posterCanvas.width, posterCanvas.height);
+                
+                // Gradient background
+                const g = ctx.createLinearGradient(0, 0, posterCanvas.width, posterCanvas.height);
+                g.addColorStop(0, '#0b63d7');
+                g.addColorStop(1, '#6b5bdb');
+                ctx.fillStyle = g;
+                ctx.fillRect(0, 0, posterCanvas.width, posterCanvas.height);
+                
+                const pad = 80;
+                
+                // White card
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, pad, pad, posterCanvas.width - pad * 2, posterCanvas.height - pad * 2, 24, true, false);
+                
+                // Header
+                ctx.fillStyle = '#06304b';
+                ctx.font = 'bold 48px Inter';
+                ctx.fillText('Prayer Times', pad + 40, pad + 70);
+                
+                ctx.font = '20px Inter';
+                const key = todayKey || isoToday();
+                ctx.fillText(new Date(key).toLocaleDateString(), pad + 40, pad + 100);
+                
+                // Desi
+                let desiTxt = '--';
+                if (desi && desi[key]) {
+                    desiTxt = `${desi[key].desi_day} ${desi[key].desi_month} ${desi[key].desi_year}`;
+                }
+                ctx.fillText('Desi: ' + desiTxt, pad + 40, pad + 132);
+                
+                // Prayers
+                const today = meeqat[key] || meeqat[Object.keys(meeqat)[0]];
+                let y = pad + 170;
+                ctx.font = '28px Inter';
+                
+                const order = ['Fajar', 'Zohar', 'Asar', 'Maghrib', 'Isha'];
+                for (const p of order) {
+                    ctx.fillStyle = '#06304b';
+                    ctx.fillText(p, pad + 60, y);
+                    
+                    ctx.fillStyle = '#0b63d7';
+                    ctx.font = 'bold 28px Inter';
+                    ctx.fillText(today && today[p] ? today[p] : '--:--', pad + 320, y);
+                    
+                    ctx.font = '28px Inter';
+                    y += 66;
+                }
+                
+                // Arabic snippet on right
+                const arabic = ayahArabicEl.textContent || '';
+                if (arabic) {
+                    ctx.textAlign = 'right';
+                    ctx.font = '28px Amiri';
+                    ctx.fillStyle = '#0b2b3a';
+                    
+                    const lines = wrapText(ctx, arabic, 500);
+                    let yy = posterCanvas.height - pad - (lines.length * 36) - 20;
+                    
+                    for (const ln of lines) {
+                        ctx.fillText(ln, posterCanvas.width - pad - 20, yy);
+                        yy += 36;
+                    }
+                    
+                    ctx.textAlign = 'left';
+                }
+                
+                // Footer
+                ctx.font = '16px Inter';
+                ctx.fillStyle = '#6b7f8f';
+                ctx.fillText('Generated by Meeqat', pad + 40, posterCanvas.height - pad + 20);
+                
+                const data = posterCanvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = data;
+                a.download = `prayer-${key}.png`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            }
+            
+            function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+                if (typeof r === 'undefined') r = 5;
+                if (typeof r === 'number') {
+                    r = { tl: r, tr: r, br: r, bl: r };
+                }
+                
+                ctx.beginPath();
+                ctx.moveTo(x + r.tl, y);
+                ctx.lineTo(x + w - r.tr, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+                ctx.lineTo(x + w, y + h - r.br);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+                ctx.lineTo(x + r.bl, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+                ctx.lineTo(x, y + r.tl);
+                ctx.quadraticCurveTo(x, y, x + r.tl, y);
+                ctx.closePath();
+                
+                if (fill) ctx.fill();
+                if (stroke) ctx.stroke();
+            }
+            
+            // Crazy popup controller (copy success)
+            (function() {
+                let popup = document.getElementById('meeqat-crazy-popup');
+                
+                if (!popup) {
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = `
+                        <div id="meeqat-crazy-popup" role="status" aria-live="polite" aria-hidden="true" style="display: none;">
+                            <div class="tick"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
+                            <div class="txt" id="meeqat-crazy-text">Mashallah Text Copied ☺️</div>
+                        </div>
+                    `;
+                    document.body.appendChild(wrapper.firstElementChild);
+                    popup = document.getElementById('meeqat-crazy-popup');
+                }
+                
+                const popupText = document.getElementById('meeqat-crazy-text');
+                let timer = null;
+                
+                window.showCrazyPopup = function(text = 'Mashallah Text Copied ☺️', duration = 1400) {
+                    if (!popup) return;
+                    
+                    popupText.textContent = text;
+                    popup.style.display = 'inline-flex';
+                    
+                    popup.classList.remove('hide');
+                    popup.classList.remove('show');
+                    void popup.offsetWidth;
+                    
+                    popup.setAttribute('aria-hidden', 'false');
+                    popup.classList.add('show');
+                    
+                    if (timer) clearTimeout(timer);
+                    
+                    timer = setTimeout(() => {
+                        popup.classList.remove('show');
+                        popup.classList.add('hide');
+                        popup.setAttribute('aria-hidden', 'true');
+                        
+                        setTimeout(() => {
+                            popup.classList.remove('hide');
+                            popup.style.display = 'none';
+                        }, 420);
+                    }, duration);
+                };
+            })();
+            
+            // Copy translation button logic
+            async function copyTranslationText() {
+                const el = ayahTranslationEl;
+                if (!el) {
+                    alert('Translation element not found');
+                    return;
+                }
+                
+                const text = el.textContent.trim();
+                if (!text) {
+                    showCrazyPopup('Nothing to copy ☹️', 1200);
+                    return;
+                }
+                
+                // Try clipboard API
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        showCrazyPopup('Mashallah Text Copied ☺️', 1400);
+                        return;
+                    } catch (e) {
+                        console.warn('clipboard failed', e);
+                    }
+                }
+                
+                // Fallback
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    
+                    document.body.appendChild(ta);
+                    ta.select();
+                    ta.setSelectionRange(0, ta.value.length);
+                    
+                    const ok = document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    
+                    if (ok) {
+                        showCrazyPopup('Mashallah Text Copied ☺️', 1400);
+                    } else {
+                        alert('Copy failed --- try manual copy.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Copy not supported');
+                }
+            }
+            
+            // Hadith copy handler
+            async function copyHadithText() {
+                const text = hadithTextEl.textContent.trim();
+                if (!text) {
+                    alert('No hadith to copy');
+                    return;
+                }
+                
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        showCrazyPopup('Hadith Copied ✓', 1200);
+                        return;
+                    } catch (e) {
+                        console.warn(e);
+                    }
+                }
+                
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    
+                    showCrazyPopup('Hadith Copied ✓', 1200);
+                } catch (e) {
+                    alert('Copy failed');
+                }
+            }
+            
+            // Week Mini chart
+            function renderWeekMini() {
+                try {
+                    const keys = Object.keys(meeqat).slice(0, 7);
+                    const labels = keys.map(k => new Date(k).toLocaleDateString(undefined, { weekday: 'short' }));
+                    
+                    const data = keys.map(k => {
+                        const t = meeqat[k];
+                        const vals = ['Fajar', 'Zohar', 'Asar', 'Maghrib', 'Isha']
+                            .map(n => t[n] ? timeToDecimalHours(t[n]) : 0)
+                            .filter(x => x > 0);
+                        
+                        return vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : 0;
+                    });
+                    
+                    if (weekChart) weekChart.destroy();
+                    
+                    weekChart = new Chart(weekMiniCtx, {
+                        type: 'bar',
+                        data: {
+                            labels,
+                            datasets: [{
+                                data,
+                                backgroundColor: 'rgba(11, 99, 215, 0.12)'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.warn('week chart', e);
+                }
+            }
+            
+            // Button wiring
+            btnGetLocation.addEventListener('click', enableQibla);
+            
+            btnPoint.addEventListener('click', () => {
+                if (latlon && latestQiblaBearing !== null) {
+                    alert(`Qibla ${latestQiblaBearing.toFixed(1)}°`);
+                } else {
+                    enableQibla();
+                }
+            });
+            
+            btnGuide.addEventListener('click', () => {
+                alert('Compass guide: allow location & orientation, move device slowly to stabilize.');
+            });
+            
+            btnCalibrate.addEventListener('click', () => {
+                alert('Calibrate by moving phone in a figure-8 motion');
+            });
+            
+            btnRefresh.addEventListener('click', async () => {
+                await loadMeeqat();
+                await loadDesi();
+                renderPrayers();
+                renderWeekMini();
+                fetchRandomAyah();
+                fetchRandomHadith();
+            });
+            
+            btnNewAyah.addEventListener('click', fetchRandomAyah);
+            btnNewHadith.addEventListener('click', fetchRandomHadith);
+            
+            btnCopyTranslation.addEventListener('click', copyTranslationText);
+            btnCopyHadith.addEventListener('click', copyHadithText);
+            
+            btnListenAyah.addEventListener('click', playAudio);
+            
+            posterBtn.addEventListener('click', drawPosterAndDownload);
+            
+            themeToggle.addEventListener('click', () => {
+                const cur = document.body.getAttribute('data-theme') || 'light';
+                document.body.setAttribute('data-theme', cur === 'light' ? 'dark' : 'light');
+            });
+            
+            document.getElementById('btn-pwa').addEventListener('click', () => {
+                alert('To install: deploy to HTTPS and use Add to Home Screen.');
+            });
+            
+            // Initialization flow
+            async function init() {
+                await loadMeeqat();
+                await loadDesi();
+                
+                renderPrayers();
+                renderWeekMini();
+                fetchRandomAyah();
+                fetchRandomHadith();
+                
+                // Initialize Qibla with default location
+                latestQiblaBearing = bearingTo(latlon.lat, latlon.lon, KAABA.lat, KAABA.lon);
+                qiblaTextEl.textContent = `Qibla: ${latestQiblaBearing.toFixed(1)}° from North`;
+                bearingLabelEl.textContent = `${latestQiblaBearing.toFixed(1)}°`;
+                needleEl.style.transform = `translateX(-50%) rotate(${latestQiblaBearing}deg)`;
+                
+                // Initialize audio
+                initAudio();
+                
+                // Small repeated refresh to keep things up to date
+                setInterval(async () => {
+                    await loadMeeqat();
+                    renderPrayers();
+                }, 15 * 60 * 1000);
+            }
+            
+            init();
+            
+            // Expose some helpers for debugging
+            window.Meeqat = {
+                drawPoster: drawPosterAndDownload,
+                reload: async () => {
+                    await loadMeeqat();
+                    renderPrayers();
+                }
+            };
+        })();
+    </script>
+    
+    <script>
+        window.addEventListener('load', () => AOS.refresh());
