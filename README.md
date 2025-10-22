@@ -8,7 +8,7 @@
 
 **A comprehensive Islamic prayer times application with Qibla compass, Quran verses, and Hadith**
 
-[Live Demo](https://umarbutteditz.github.io/Deenseek) • [Features](#features) • [Installation](#installation) • [About](https://github.com/umarbutteditz/Deenseek/blob/main/ABOUT.md)
+[Live Demo](https://umarbutteditz.github.io/Deenseek) • [Features](https://github.com/umarbutteditz/Deenseek/blob/main/Features.md) • [Installation](https://github.com/umarbutteditz/Deenseek/blob/main/INSTALLATION.md) • [About](https://github.com/umarbutteditz/Deenseek/blob/main/ABOUT.md)
 
 </div>
 

@@ -39,6 +39,7 @@ npx http-server
 
 ### File Structure Overview
 
+``` bash
 Deenseek/
 ├── index.html              # Main application
 ├── meeqat_2025.json        # Prayer times database
@@ -46,6 +47,7 @@ Deenseek/
 ├── jekyll-gh-pages.yml     # GitHub Pages config
 ├── static.yml             # Static deployment config
 └── README.md              # Documentation
+```
 
 ## PWA Installation
 
