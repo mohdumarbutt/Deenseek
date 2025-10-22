@@ -1,7 +1,6 @@
 
 ## 3. ABOUT.md
 
-```markdown
 # 👨‍💻 About the Developer
 
 ## Mohd Umar Butt
