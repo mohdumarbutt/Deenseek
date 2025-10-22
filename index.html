@@ -1186,7 +1186,7 @@
                     ayahRefEl.textContent = arab ? `${arab.surah ? arab.surah.englishName : ''} ${arab.numberInSurah || ''}` : '';
                 } catch (e) {
                     console.warn('ayah err', e);
-                    ayahArabicEl.textContent = 'Could not fetch ayah';
+                    ayahArabicEl.textContent = 'Check Your Internet Connection';
                     ayahTranslationEl.textContent = '';
                 }
             }
