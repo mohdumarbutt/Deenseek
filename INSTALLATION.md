@@ -1,211 +1,217 @@
 # 🚀 Installation Guide
 
-## Quick Start
+This document provides instructions for installing and setting up the **Deenseek** application, whether for immediate use or for local development.
+
+-----
+
+## 1\. Quick Start
 
 ### Browser Usage (Easiest)
-1. **Download** the project files
-2. **Open** `index.html` in your web browser
-3. **Start using** the application immediately
+
+This method requires no local setup or command line tools.
+
+1.  **Download** the project files (e.g., as a ZIP archive).
+2.  **Unzip** the archive.
+3.  **Open** the file `index.html` in your web browser.
+4.  **Start using** the application immediately.
 
 ### Live Demo
-Visit the live application at:  
+
+You can visit the live, publicly hosted version of the application here:
 [https://umarbutteditz.github.io/Deenseek](https://umarbutteditz.github.io/Deenseek)
 
-## Local Development Setup
+-----
+
+## 2\. Local Development Setup
 
 ### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Basic understanding of web technologies (for development)
+
+  * Modern web browser (**Chrome, Firefox, Safari, Edge**).
+  * Basic understanding of web technologies (HTML, JavaScript) is recommended for development.
+  * **Git** installed on your system.
 
 ### Step-by-Step Installation
 
+1.  **Clone the repository:**
 
-# 1. Clone the repository
-git clone https://github.com/umarbutteditz/Deenseek.git
+    ```bash
+    git clone https://github.com/umarbutteditz/Deenseek.git
+    ```
 
-# 2. Navigate to project directory
-cd Deenseek
+2.  **Navigate to project directory:**
 
-# 3. Open in browser (multiple methods)
+    ```bash
+    cd Deenseek
+    ```
 
-# Method A: Double-click index.html
-# Method B: Use Python simple server
-python -m http.server 8000
-# Then visit http://localhost:8000
+3.  **Open in browser (multiple methods):**
 
-# Method C: Use Node.js http-server
-npx http-server
-# Then visit the provided local address
+      * **Method A: Double-click** `index.html` (simplest, but may have limitations with certain browser security policies, like local file access).
+      * **Method B: Use Python simple server** (Recommended for local testing):
+        ```bash
+        python -m http.server 8000
+        # Then visit http://localhost:8000 in your browser
+        ```
+      * **Method C: Use Node.js http-server** (Requires Node.js/npm):
+        ```bash
+        npx http-server
+        # Then visit the provided local address (e.g., http://127.0.0.1:8080)
+        ```
 
 ### File Structure Overview
 
-``` bash
+```
 Deenseek/
-├── index.html              # Main application
+├── index.html              # Main application entry point
 ├── meeqat_2025.json        # Prayer times database
 ├── desi_calendar_2025.json # Desi calendar data
-├── jekyll-gh-pages.yml     # GitHub Pages config
-├── static.yml             # Static deployment config
-└── README.md              # Documentation
+├── jekyll-gh-pages.yml     # GitHub Pages configuration file
+├── static.yml              # Static deployment configuration
+└── README.md               # Project documentation
 ```
 
-## PWA Installation
+-----
+
+## 3\. PWA (Progressive Web App) Installation
+
+The application can be installed on your device to run like a native app.
 
 ### Mobile Devices
 
-#### Android (Chrome)
-1. Open the app in Chrome browser
-2. Tap the menu (three dots) → "Add to Home screen"
-3. Confirm the installation
-4. Launch from home screen like a native app
-
-#### iOS (Safari)
-1. Open the app in Safari
-2. Tap the share button (square with arrow)
-3. Scroll down and tap "Add to Home Screen"
-4. Confirm and launch from home screen
+| Platform | Instructions |
+| :--- | :--- |
+| **Android (Chrome)** | 1. Open the app in the Chrome browser. <br> 2. Tap the menu (three dots) → **"Add to Home screen"**. <br> 3. Confirm the installation and launch from the home screen. |
+| **iOS (Safari)** | 1. Open the app in Safari. <br> 2. Tap the share button (square with arrow). <br> 3. Scroll down and tap **"Add to Home Screen"**. <br> 4. Confirm and launch from the home screen. |
 
 ### Desktop PWA
-1. Open in Chrome/Edge
-2. Look for install prompt in address bar
-3. Click "Install" or use browser menu
-4. App will open in dedicated window
 
-## Deployment Options
+1.  Open the application in Chrome or Edge.
+2.  Look for the install prompt icon in the address bar.
+3.  Click **"Install"** or use the browser menu.
+4.  The app will open in a dedicated, frameless window.
+
+-----
+
+## 4\. Deployment Options
 
 ### GitHub Pages (Automatic)
-- Repository is configured for GitHub Pages
-- Automatic deployment on push to main branch
-- Access via: `https://username.github.io/Deenseek`
+
+  * The repository is already configured for **GitHub Pages**.
+  * Deployment occurs **automatically** on every push to the `main` branch.
+  * The application is accessible via: `https://username.github.io/Deenseek`
 
 ### Manual Web Hosting
-1. Upload all files to web server
-2. Ensure proper MIME types for JSON files
-3. Configure HTTPS for geolocation features
-4. Test all functionality
+
+1.  Upload all files from the project root to your web server.
+2.  Ensure proper **MIME types** are configured for JSON files.
+3.  Configure **HTTPS** (SSL/TLS) for geolocation features to work securely.
+4.  Test all functionality thoroughly after upload.
 
 ### Local Network Deployment
 
-# Using Python
-python -m http.server 8080
+For sharing within a local network (LAN) for testing:
 
-# Using Node.js
-npx serve .
+| Tool | Command |
+| :--- | :--- |
+| **Python** | `python -m http.server 8080` |
+| **Node.js** | `npx serve .` |
+| **PHP** | `php -S localhost:8000` |
 
-# Using PHP
-php -S localhost:8000
+-----
 
-
-## Configuration
+## 5\. Configuration & Permissions
 
 ### Location Settings
-- **Automatic**: Uses device GPS (requires permission)
-- **Manual**: Set custom coordinates
-- **Default**: Bunjwah, Kishtwar (33.3167, 75.7667)
 
-### Prayer Calculation
-- Based on provided prayer time data
-- Automatic timezone detection
-- Local time conversion
-- Seasonal adjustments
+  * **Automatic**: Uses device GPS (requires user permission).
+  * **Manual**: Allows the user to set custom coordinates.
+  * **Default**: Bunjwah, Kishtwar (**33.3167, 75.7667**) is used as a fallback.
 
-### Permissions Required
-- **Location**: For accurate Qibla direction
-- **Orientation**: For compass functionality
-- **Storage**: For caching and preferences
-- **Audio**: For Quran recitation
+### Application Permissions Required
 
-## Troubleshooting
+| Permission | Purpose |
+| :--- | :--- |
+| **Location** | For accurate **Qibla** direction. |
+| **Orientation** | For **compass** functionality. |
+| **Storage** | For caching and user preferences. |
+| **Audio** | For **Quran recitation** features. |
 
-### Common Issues
+-----
 
-#### Qibla Compass Not Working
-- Ensure location permissions are granted
-- Check device has compass/magnetometer
-- Calibrate device by moving in figure-8 pattern
-- Try in different location (avoid magnetic interference)
+## 6\. Troubleshooting
 
-#### Prayer Times Not Loading
-- Check internet connection for initial load
-- Verify JSON files are accessible
-- Clear browser cache and reload
-- Check browser console for errors
+### Common Issues and Solutions
 
-#### Audio Not Playing
-- Ensure volume is not muted
-- Check browser audio permissions
-- Try different audio source
-- Verify internet connection for audio streaming
-
-#### Location Detection Failed
-- Enable location services on device
-- Grant browser location permission
-- Try in area with better GPS signal
-- Use manual location as fallback
+| Issue | Solution Steps |
+| :--- | :--- |
+| **Qibla Compass Not Working** | 1. Ensure location permissions are granted. <br> 2. Check if the device has a compass/magnetometer sensor. <br> 3. **Calibrate** the device by moving it in a figure-8 pattern. <br> 4. Try in a different location (avoid magnetic interference). |
+| **Prayer Times Not Loading** | 1. Check internet connection for initial data load. <br> 2. Verify the JSON data files are accessible. <br> 3. Clear browser cache and reload the page. <br> 4. Check the browser console for errors. |
+| **Audio Not Playing** | 1. Ensure device and browser volume is not muted. <br> 2. Check browser audio permissions. <br> 3. Try a different audio source or quality setting. <br> 4. Verify internet connection for audio streaming. |
+| **Location Detection Failed** | 1. Enable location services on the device. <br> 2. Grant the browser location permission when prompted. <br> 3. Try in an area with a better GPS signal. <br> 4. Use manual location as a fallback. |
 
 ### Browser Compatibility
 
 | Browser | Qibla Compass | Geolocation | Audio | PWA |
-|---------|---------------|-------------|--------|-----|
-| Chrome | ✅ | ✅ | ✅ | ✅ |
-| Firefox | ✅ | ✅ | ✅ | ✅ |
-| Safari | ✅ | ✅ | ✅ | ✅ |
-| Edge | ✅ | ✅ | ✅ | ✅ |
+| :--- | :--- | :--- | :--- | :--- |
+| **Chrome** | ✅ | ✅ | ✅ | ✅ |
+| **Firefox** | ✅ | ✅ | ✅ | ✅ |
+| **Safari** | ✅ | ✅ | ✅ | ✅ |
+| **Edge** | ✅ | ✅ | ✅ | ✅ |
 
-### Mobile Specific
+### Mobile Specific Performance Tips
 
-#### Performance Tips
-- Close other apps for better compass accuracy
-- Use in landscape mode for better compass view
-- Keep device flat and steady for calibration
-- Allow all requested permissions
+  * Close other background apps for better compass accuracy.
+  * Use the app in **landscape mode** for optimal compass view.
+  * Keep the device flat and steady during Qibla calibration.
+  * Allow all requested permissions for full functionality.
 
-#### Battery Optimization
-- App is lightweight and battery-friendly
-- No background processes when closed
-- Efficient sensor usage
-- Minimal data consumption
+-----
 
-## Development Setup
+## 7\. Development & Support
 
 ### For Contributors
 
-# Fork and clone
-git clone https://github.com/your-username/Deenseek.git
+1.  **Fork and clone** the repository:
+    ```bash
+    git clone https://github.com/your-username/Deenseek.git
+    ```
+2.  **Create a feature branch:**
+    ```bash
+    git checkout -b feature/your-feature
+    ```
+3.  **Make changes and test locally** (by opening `index.html` in your browser).
+4.  **Commit and push** your changes:
+    ```bash
+    git add .
+    git commit -m "Add your feature"
+    git push origin feature/your-feature
+    ```
+5.  **Create a pull request** on the main repository.
 
-# Create feature branch
-git checkout -b feature/your-feature
+### Testing Guidelines
 
-# Make changes and test locally
-# Open index.html in browser
+  * Test on multiple devices and browsers.
+  * Verify all prayer calculations are accurate.
+  * Check compass accuracy in different physical locations.
+  * Test offline (caching) functionality.
+  * Validate the responsive design across screen sizes.
 
-# Commit and push
-git add .
-git commit -m "Add your feature"
-git push origin feature/your-feature
+### Support
 
-# Create pull request
+**Getting Help:**
 
-### Testing
-- Test on multiple devices and browsers
-- Verify all prayer calculations
-- Check compass accuracy in different locations
-- Test offline functionality
-- Validate responsive design
+  * Check this documentation first.
+  * Review the browser console for specific JavaScript errors.
+  * Test with different browsers to isolate the issue.
+  * Verify file permissions if deploying on a server.
 
-## Support
+**Reporting Issues:**
 
-### Getting Help
-- Check this documentation first
-- Review browser console for errors
-- Test with different browsers
-- Verify file permissions on server
+1.  Describe the problem clearly and concisely.
+2.  Include your device and browser information.
+3.  Note any specific error messages shown in the console.
+4.  Provide clear, numbered steps to reproduce the bug.
 
-### Reporting Issues
-1. Describe the problem clearly
-2. Include device and browser information
-3. Note any error messages
-4. Provide steps to reproduce
+**Feature Requests:**
 
-### Feature Requests
-Suggest new features through GitHub issues with detailed descriptions of desired functionality.
+  * Suggest new features through **GitHub issues** with detailed descriptions of the desired functionality and user benefit.
