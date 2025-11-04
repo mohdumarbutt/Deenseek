@@ -14,7 +14,7 @@
 
 ## 🌟 Overview
 
-Deenseek is a feature-rich, mobile-first web application designed to help Muslims worldwide track prayer times, locate Qibla direction, and engage with Islamic content. Built with modern web technologies, it offers a seamless experience across all devices.
+Deenseek is a feature-rich, mobile-first web application designed to help Muslims worldwide track prayer times, locate Qibla direction, and engage with Islamic content. Built with modern web technologies, it offers a seamless experience across all devices..
 
 ## ✨ Features
 
