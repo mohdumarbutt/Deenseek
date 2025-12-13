@@ -91,10 +91,10 @@
             font-weight: 700;
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
             box-shadow: var(--shadow);
-            animation: pulse 2s infinite;
+            animation: logoPulse 2s infinite;
         }
 
-        @keyframes pulse {
+        @keyframes logoPulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
@@ -529,7 +529,13 @@
 
         .btn.playing {
             background: var(--success);
-            animation: pulse 1.5s infinite;
+            animation: buttonPulse 1.5s infinite;
+        }
+
+        @keyframes buttonPulse {
+            0% { box-shadow: 0 0 0 0 rgba(10, 163, 107, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(10, 163, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(10, 163, 107, 0); }
         }
 
         .btn.warning {
@@ -538,23 +544,6 @@
 
         .btn.danger {
             background: var(--danger);
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(10, 163, 107, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(10, 163, 107, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(10, 163, 107, 0); }
-        }
-
-        @keyframes prohibited {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 5px rgba(11, 99, 215, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(11, 99, 215, 0.8); }
         }
 
         .chart-wrap {
@@ -1330,11 +1319,6 @@
             const needleEl = document.getElementById('needle');
             const bearingLabelEl = document.getElementById('bearingLabel');
             const accuracyLabelEl = document.getElementById('accuracyLabel');
-            const ayahArabicEl = document.getElementById('ayahArabic');
-            const ayahTranslationEl = document.getElementById('ayahTranslation');
-            const ayahRefEl = document.getElementById('ayahRef');
-            const hadithTextEl = document.getElementById('hadithText');
-            const hadithRefEl = document.getElementById('hadithRef');
             const statDayLengthEl = document.getElementById('statDayLength');
             const statNightLengthEl = document.getElementById('statNightLength');
             const statTimeToNextEl = document.getElementById('statTimeToNext');
@@ -1343,8 +1327,6 @@
             const prayerChartCtx = document.getElementById('prayerChart').getContext('2d');
             const weekMiniCtx = document.getElementById('weekMini').getContext('2d');
             const posterCanvas = document.getElementById('posterCanvas');
-            const volumeControl = document.getElementById('volumeControl');
-            const audioStatus = document.getElementById('audioStatus');
             const notificationBadge = document.getElementById('notificationBadge');
             
             // Daily elements
@@ -2008,7 +1990,7 @@
                     
                     if (actualDiff < 10) {
                         compassHint('🎯 Pointing towards Qibla!');
-                        needleEl.style.animation = 'glow 1s infinite';
+                        needleEl.style.animation = 'glowPrimary 1s infinite';
                     } else {
                         compassHint('Point device toward Kaaba');
                         needleEl.style.animation = '';
@@ -2026,34 +2008,10 @@
             function initAudio() {
                 audio = new Audio();
                 audio.preload = 'auto';
-                audio.volume = volumeControl.value;
-                
-                audio.addEventListener('play', () => {
-                    document.getElementById('btn-listen-ayah').classList.add('playing');
-                    audioStatus.textContent = 'Playing...';
-                });
-                
-                audio.addEventListener('pause', () => {
-                    document.getElementById('btn-listen-ayah').classList.remove('playing');
-                    audioStatus.textContent = 'Paused';
-                });
-                
-                audio.addEventListener('ended', () => {
-                    document.getElementById('btn-listen-ayah').classList.remove('playing');
-                    audioStatus.textContent = 'Finished playing';
-                    setTimeout(() => {
-                        audioStatus.textContent = 'Ready to play';
-                    }, 2000);
-                });
+                audio.volume = 0.7;
                 
                 audio.addEventListener('error', (e) => {
                     console.error('Audio error:', e);
-                    document.getElementById('btn-listen-ayah').classList.remove('playing');
-                    audioStatus.textContent = 'Error loading audio';
-                });
-                
-                volumeControl.addEventListener('input', () => {
-                    if (audio) audio.volume = volumeControl.value;
                 });
             }
             
@@ -2115,95 +2073,56 @@
                             .then(() => console.log('Audio is playing'))
                             .catch(error => {
                                 console.error('Playback failed:', error);
-                                audioStatus.textContent = 'Playback failed. Click again.';
                             });
                     } else {
                         audio.pause();
                     }
                 } catch (error) {
                     console.error('Audio error:', error);
-                    audioStatus.textContent = 'Audio error. Please try again.';
                 }
             }
             
-            function playDailyAudio() {
-                if (!dailyAudio) initDailyAudio();
-                
-                try {
-                    if (dailyAudio.paused) {
-                        dailyAudio.playbackRate = audioPlaybackSpeed;
-                        dailyAudio.play()
-                            .then(() => console.log('Daily audio is playing'))
-                            .catch(error => {
-                                console.error('Daily playback failed:', error);
-                                dailyAudioStatus.textContent = 'Playback failed. Click again.';
-                            });
-                    } else {
-                        dailyAudio.pause();
-                    }
-                } catch (error) {
-                    console.error('Daily audio error:', error);
-                    dailyAudioStatus.textContent = 'Audio error. Please try again.';
-                }
-            }
-            
-            // Quran & Hadith fetch
-            let currentAyahNumber = null;
-            
-            async function fetchRandomAyah() {
-                try {
-                    ayahArabicEl.textContent = 'Loading...';
-                    ayahTranslationEl.textContent = 'Loading translation...';
-                    ayahRefEl.textContent = '';
-                    
-                    const n = Math.floor(Math.random() * TOTAL_AYAH) + 1;
-                    currentAyahNumber = n;
-                    const url = `https://api.alquran.cloud/v1/ayah/${n}/editions/quran-uthmani,en.asad`;
-                    
-                    const r = await fetch(url);
-                    if (!r.ok) throw new Error('Quran API failed');
-                    
-                    const j = await r.json();
-                    const arab = j.data.find(d => d.edition.language === 'ar');
-                    const eng = j.data.find(d => d.edition.language === 'en');
-                    
-                    ayahArabicEl.textContent = arab ? arab.text : '---';
-                    ayahTranslationEl.textContent = eng ? eng.text : '---';
-                    ayahRefEl.textContent = arab ? `Surah ${arab.surah ? arab.surah.englishName : ''} : Ayah ${arab.numberInSurah || ''}` : '';
-                    
-                    // Set audio source
-                    if (arab && arab.number) {
-                        const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${arab.surah.number}.mp3`;
-                        if (audio) audio.src = audioUrl;
-                    }
-                } catch (e) {
-                    console.warn('ayah err', e);
-                    ayahArabicEl.textContent = 'Check Your Internet Connection';
-                    ayahTranslationEl.textContent = '';
-                }
-            }
-            
-            async function fetchRandomHadith() {
-                try {
-                    hadithTextEl.textContent = 'Loading...';
-                    hadithRefEl.textContent = '';
-                    
-                    const max = 7563;
-                    const n = Math.floor(Math.random() * max) + 1;
-                    const url = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/${n}.min.json`;
-                    
-                    const r = await fetch(url);
-                    if (!r.ok) throw new Error('Hadith fetch failed');
-                    
-                    const j = await r.json();
-                    hadithTextEl.textContent = j.text || j.hadith || '---';
-                    hadithRefEl.textContent = `Sahih Bukhari • Book ${j.book || ''}`;
-                } catch (e) {
-                    console.warn('hadith err', e);
-                    hadithTextEl.textContent = 'Could not load hadith';
-                }
-            }
-            
+             function playDailyAudio() {
+  // always create a fresh element; old one is garbage-collected
+  const a = new Audio();
+  a.volume   = dailyVolumeControl.value;
+  a.playbackRate = audioPlaybackSpeed;
+  a.preload  = 'auto';
+
+  // same src logic as before
+  if (dailyAyahArabicEl.textContent !== 'Loading...' && currentDailyAyah) {
+    a.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${currentDailyAyah}.mp3`;
+  } else {
+    dailyAudioStatus.textContent = 'Verse not loaded yet';
+    return;
+  }
+
+  // UI feedback
+  document.getElementById('btn-listen-daily-verse').classList.add('playing');
+  dailyAudioStatus.textContent = 'Playing...';
+
+  a.addEventListener('play', () => {
+    dailyAudioStatus.textContent = 'Playing...';
+  });
+
+  a.addEventListener('ended', () => {
+    document.getElementById('btn-listen-daily-verse').classList.remove('playing');
+    dailyAudioStatus.textContent = 'Finished';
+  }, { once: true });
+
+  a.addEventListener('error', () => {
+    document.getElementById('btn-listen-daily-verse').classList.remove('playing');
+    dailyAudioStatus.textContent = 'Playback error';
+  }, { once: true });
+
+  // start playback
+  a.play().catch(err => {
+    console.warn('Daily playback failed:', err);
+    document.getElementById('btn-listen-daily-verse').classList.remove('playing');
+    dailyAudioStatus.textContent = 'Playback failed';
+  });
+}
+
             // Poster generation
             async function ensureFontsReady() {
                 if (document.fonts && document.fonts.ready) {
@@ -2668,8 +2587,6 @@ Generated by Meeqat - Prayer Times App`;
                 await loadDesi();
                 renderPrayers();
                 renderWeekMini();
-                fetchRandomAyah();
-                fetchRandomHadith();
                 showCrazyPopup('Data refreshed! ✅', 1500);
             });
             
@@ -2767,9 +2684,6 @@ Generated by Meeqat - Prayer Times App`;
                 }
             });
             
-            document.getElementById('btn-new-ayah').addEventListener('click', fetchRandomAyah);
-            document.getElementById('btn-new-hadith').addEventListener('click', fetchRandomHadith);
-            
             document.getElementById('posterBtn').addEventListener('click', drawPosterAndDownload);
             
             document.getElementById('btn-share').addEventListener('click', sharePrayerTimes);
@@ -2827,8 +2741,6 @@ Generated by Meeqat - Prayer Times App`;
                 
                 renderPrayers();
                 renderWeekMini();
-                fetchRandomAyah();
-                fetchRandomHadith();
                 
                 // Initialize Qibla with default location
                 latestQiblaBearing = bearingTo(latlon.lat, latlon.lon, KAABA.lat, KAABA.lon);
